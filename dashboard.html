@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case History · Stay Classification Record</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="blueprint-bg" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="page">
+
+  <div id="siteNav"></div>
+
+  <header class="letterhead">
+    <div class="letterhead-mark" aria-hidden="true">
+      <svg viewBox="0 0 64 64" width="46" height="46">
+        <circle cx="32" cy="32" r="30" fill="none" stroke="currentColor" stroke-width="2"/>
+        <circle cx="32" cy="32" r="24" fill="none" stroke="currentColor" stroke-width="1"/>
+        <path d="M20 40 L20 24 L32 16 L44 24 L44 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <line x1="16" y1="40" x2="48" y2="40" stroke="currentColor" stroke-width="2"/>
+      </svg>
+    </div>
+    <div class="letterhead-text">
+      <p class="letterhead-eyebrow">Bureau of Short-Term Stay Classification <span class="dot">·</span> City of New York</p>
+      <h1 class="letterhead-title">Case history</h1>
+      <p class="letterhead-sub">Every listing you have filed for classification, most recent first.</p>
+    </div>
+    <div class="letterhead-ref">
+      <span>FORM RT-3</span>
+      <span id="recordCount">— records</span>
+    </div>
+  </header>
+
+  <section class="panel" id="historyPanel">
+    <div class="panel-head">
+      <h2><span class="section-mark">§3</span> Filed records</h2>
+      <a href="index.html" class="btn-official">File a new record</a>
+    </div>
+
+    <div id="historyLoading" class="result-empty">
+      <svg class="empty-seal" viewBox="0 0 120 120" width="70" height="70" aria-hidden="true">
+        <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 5"/>
+      </svg>
+      <p>Retrieving your case history…</p>
+    </div>
+
+    <div id="historyEmpty" class="result-empty" hidden>
+      <svg class="empty-seal" viewBox="0 0 120 120" width="70" height="70" aria-hidden="true">
+        <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 5"/>
+        <text x="60" y="65" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="currentColor">NO FILINGS</text>
+      </svg>
+      <p>No listings filed yet. Submit your first record to see it here.</p>
+    </div>
+
+    <div id="historyError" class="form-error" role="alert"></div>
+
+    <table class="history-table" id="historyTable" hidden>
+      <thead>
+        <tr>
+          <th>Filed</th>
+          <th>Classification</th>
+          <th>Borough / Neighbourhood</th>
+          <th>Price</th>
+          <th>Min. nights</th>
+          <th>Reviews</th>
+        </tr>
+      </thead>
+      <tbody id="historyBody"></tbody>
+    </table>
+  </section>
+
+  <footer class="page-footer">
+    <p>Classification issued by an automated scikit-learn model trained on NYC Airbnb listing records
+      <span class="dot">·</span> not an official City of New York service</p>
+  </footer>
+</div>
+
+<script src="common.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>

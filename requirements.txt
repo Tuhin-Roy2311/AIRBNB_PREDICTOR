@@ -1,0 +1,19 @@
+fastapi
+uvicorn[standard]
+pandas
+scikit-learn
+joblib
+
+# --- new: database ---
+sqlalchemy>=2.0
+psycopg2-binary
+alembic
+
+# --- new: auth ---
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart   # required for OAuth2PasswordRequestForm
+
+# --- new: config ---
+pydantic-settings
+python-dotenv

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register as Filer · Stay Classification Record</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="blueprint-bg" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="page page-narrow">
+
+  <header class="letterhead letterhead-compact">
+    <div class="letterhead-mark" aria-hidden="true">
+      <svg viewBox="0 0 64 64" width="40" height="40">
+        <circle cx="32" cy="32" r="30" fill="none" stroke="currentColor" stroke-width="2"/>
+        <circle cx="32" cy="32" r="24" fill="none" stroke="currentColor" stroke-width="1"/>
+        <path d="M20 40 L20 24 L32 16 L44 24 L44 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <line x1="16" y1="40" x2="48" y2="40" stroke="currentColor" stroke-width="2"/>
+      </svg>
+    </div>
+    <div class="letterhead-text">
+      <p class="letterhead-eyebrow">Bureau of Short-Term Stay Classification</p>
+      <h1 class="letterhead-title">Register as a filer</h1>
+      <p class="letterhead-sub">Create an account to file listings and keep a record of every classification.</p>
+    </div>
+  </header>
+
+  <section class="panel intake-panel">
+    <form id="registerForm" class="auth-form">
+      <div class="field">
+        <label for="registerEmail">Email</label>
+        <input type="email" id="registerEmail" name="email" placeholder="you@example.com" required>
+      </div>
+      <div class="field">
+        <label for="registerPassword">Choose a passcode</label>
+        <input type="password" id="registerPassword" name="password" placeholder="At least 8 characters" minlength="8" required>
+      </div>
+      <button type="submit" class="btn-official btn-submit" id="registerBtn">
+        <span class="btn-label">Register as filer</span>
+        <span class="btn-spinner" aria-hidden="true"></span>
+      </button>
+      <p class="form-error" id="authError" role="alert"></p>
+    </form>
+
+    <p class="switch-link">Already registered? <a href="login.html">Verify identity</a></p>
+  </section>
+
+  <footer class="page-footer">
+    <p>Classification issued by an automated scikit-learn model trained on NYC Airbnb listing records
+      <span class="dot">·</span> not an official City of New York service</p>
+  </footer>
+</div>
+
+<script src="common.js"></script>
+<script src="register.js"></script>
+</body>
+</html>
