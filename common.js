@@ -35,24 +35,19 @@ function logout() {
 }
 
 /**
- * Call at the top of any page that requires a logged-in user.
- * Verifies the stored token against /me. If missing/invalid, redirects
- * to login.html (carrying the current page as ?next= so login can
- * send the user back). Resolves with the user object on success.
+ * Checks whether the stored token is valid, without redirecting anyone.
+ * Returns the user object if logged in, or null if not — every page
+ * uses this to decide what to show, instead of being bounced away.
  */
-async function requireAuth() {
+async function getCurrentUser() {
   const token = getToken();
-  if (!token) {
-    redirectToLogin();
-    return null;
-  }
+  if (!token) return null;
   try {
     const res = await fetch(ME_ENDPOINT, { headers: authHeaders() });
     if (!res.ok) throw new Error("session invalid");
     return await res.json();
   } catch {
     setToken(null);
-    redirectToLogin();
     return null;
   }
 }
@@ -62,18 +57,34 @@ function redirectToLogin() {
   window.location.href = `login.html?next=${next}`;
 }
 
-/** Fills in the shared top nav bar once the user is known. */
+/**
+ * Fills in the shared top nav bar — works whether or not the person
+ * is logged in, so it's the same bar on every page of the site.
+ */
 function renderNav(user, activePage) {
   const mount = document.getElementById("siteNav");
   if (!mount) return;
-  mount.innerHTML = `
-    <nav class="site-nav">
-      <a href="dashboard.html" class="${activePage === "dashboard" ? "active" : ""}">Case history</a>
-      <a href="index.html" class="${activePage === "predict" ? "active" : ""}">New filing</a>
-      <span class="nav-spacer"></span>
-      <span class="nav-user">${user?.email ?? ""}</span>
-      <button type="button" class="btn-ghost" id="navLogout">Log out</button>
-    </nav>
-  `;
-  document.getElementById("navLogout").addEventListener("click", logout);
+
+  if (user) {
+    mount.innerHTML = `
+      <nav class="site-nav">
+        <a href="index.html" class="brand">🏠 StayCheck</a>
+        <a href="index.html" class="${activePage === "predict" ? "active" : ""}">🔍 Check a listing</a>
+        <a href="dashboard.html" class="${activePage === "dashboard" ? "active" : ""}">📋 My guesses</a>
+        <span class="nav-spacer"></span>
+        <span class="nav-user">${user.email}</span>
+        <button type="button" class="btn-ghost" id="navLogout">Log out</button>
+      </nav>
+    `;
+    document.getElementById("navLogout").addEventListener("click", logout);
+  } else {
+    mount.innerHTML = `
+      <nav class="site-nav">
+        <a href="index.html" class="brand">🏠 StayCheck</a>
+        <span class="nav-spacer"></span>
+        <a href="login.html" class="${activePage === "login" ? "active" : ""}">Log in</a>
+        <a href="register.html" class="btn-primary nav-signup ${activePage === "register" ? "active" : ""}">Sign up</a>
+      </nav>
+    `;
+  }
 }

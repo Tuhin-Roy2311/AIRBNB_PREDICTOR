@@ -1,3 +1,5 @@
+renderNav(null, "register");
+
 const registerForm = document.getElementById("registerForm");
 const registerBtn = document.getElementById("registerBtn");
 const authError = document.getElementById("authError");
@@ -19,7 +21,7 @@ registerForm.addEventListener("submit", async (e) => {
     });
     if (!res.ok) {
       const err = await res.json().catch(() => null);
-      throw new Error(formatDetail(err?.detail) || "Registration failed.");
+      throw new Error(formatDetail(err?.detail) || "Something went wrong signing you up.");
     }
 
     // Auto-login right after registering, then go straight to the dashboard.
@@ -32,7 +34,6 @@ registerForm.addEventListener("submit", async (e) => {
       body,
     });
     if (!tokenRes.ok) {
-      // Registered fine, but auto-login failed — send them to log in manually.
       window.location.href = "login.html";
       return;
     }
@@ -41,7 +42,7 @@ registerForm.addEventListener("submit", async (e) => {
     window.location.href = "dashboard.html";
   } catch (err) {
     authError.textContent = err.message?.includes("fetch")
-      ? "Can't reach the classification registry. Make sure the API is running."
+      ? "Can't reach the server right now — make sure it's running."
       : err.message;
   } finally {
     setLoading(false);

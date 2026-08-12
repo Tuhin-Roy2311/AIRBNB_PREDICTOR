@@ -1,9 +1,9 @@
-// ROOM_CLASSES: each mapped to a document-accent color used for its
-// stamp, bullet, and progress bar.
+// Each room type mapped to an accent color and a small emoji, used
+// consistently across the guess card, bullets, and confidence bars.
 const ROOM_CLASSES = [
-  { key: "Entire home/apt", label: "Entire home/apt", color: "#1F3D5C" },
-  { key: "Private room", label: "Private room", color: "#2F6B45" },
-  { key: "Shared room", label: "Shared room", color: "#A23324" },
+  { key: "Entire home/apt", label: "Whole place", emoji: "🏠", color: "#14A38C", soft: "rgba(20,163,140,0.12)" },
+  { key: "Private room", label: "Private room", emoji: "🛏️", color: "#FF6B54", soft: "rgba(255,107,84,0.12)" },
+  { key: "Shared room", label: "Shared room", emoji: "🛋️", color: "#FFB648", soft: "rgba(255,182,72,0.16)" },
 ];
 
 // A few realistic example listings so people can explore without typing.
@@ -32,11 +32,15 @@ const REDUCE_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matc
 // INIT — gate the whole page behind auth, then wire everything up
 // ============================================================
 (async function init() {
-  const user = await requireAuth();
-  if (!user) return; // requireAuth already redirected to login
-
+  const user = await getCurrentUser();
   renderNav(user, "predict");
-  checkApiStatus();
+
+  if (user) {
+    document.getElementById("appContent").hidden = false;
+    checkApiStatus();
+  } else {
+    document.getElementById("authPrompt").hidden = false;
+  }
 })();
 
 // ============================================================
@@ -88,15 +92,15 @@ form.addEventListener("submit", async (e) => {
 
     if (!res.ok) {
       const body = await res.json().catch(() => null);
-      throw new Error(body?.detail ? formatDetail(body.detail) : `Filing failed (${res.status}).`);
+      throw new Error(body?.detail ? formatDetail(body.detail) : `That didn't work (${res.status}).`);
     }
 
     const result = await res.json();
     renderResult(result);
   } catch (err) {
     formError.textContent = err.message?.includes("fetch")
-      ? "Can't reach the classification registry. Make sure the FastAPI server is running and reachable."
-      : err.message || "Something went wrong. Check the values and try again.";
+      ? "Can't reach the server right now — make sure it's running."
+      : err.message || "Something went wrong. Double check the values and try again.";
   } finally {
     setLoading(false);
   }
@@ -131,11 +135,11 @@ function setLoading(isLoading) {
 }
 
 // ============================================================
-// RESULT RENDERING — ink stamp + probability ledger
+// RESULT RENDERING — friendly guess card + confidence bars
 // ============================================================
 const resultEmpty = document.getElementById("resultEmpty");
 const resultContent = document.getElementById("resultContent");
-const stampMount = document.getElementById("stampMount");
+const guessMount = document.getElementById("guessMount");
 const probList = document.getElementById("probList");
 
 function renderResult(result) {
@@ -150,34 +154,36 @@ function renderResult(result) {
   resultEmpty.hidden = true;
   resultContent.hidden = false;
 
-  buildStamp(paired, predicted);
-  buildLedger(paired, predicted);
+  buildGuessCard(paired, predicted);
+  buildConfidenceList(paired, predicted);
 }
 
-function buildStamp(paired, predicted) {
-  stampMount.innerHTML = "";
+function buildGuessCard(paired, predicted) {
+  guessMount.innerHTML = "";
   const match = paired.find((c) => c.key === predicted) || paired[0];
+  const pct = Math.round(match.prob * 100);
 
-  const stamp = document.createElement("div");
-  stamp.className = "stamp";
-  stamp.style.setProperty("--stamp-color", match.color);
+  const card = document.createElement("div");
+  card.className = "guess-card";
+  card.style.setProperty("--guess-color", match.color);
+  card.style.setProperty("--guess-soft", match.soft);
 
-  const refNumber = `RT-${Math.floor(100000 + Math.random() * 899999)}`;
-
-  stamp.innerHTML = `
-    <span class="stamp-eyebrow">Classified as</span>
-    <span class="stamp-label">${match.label}</span>
-    <span class="stamp-ref">Record No. ${refNumber}</span>
+  card.innerHTML = `
+    <span class="guess-emoji">${match.emoji}</span>
+    <div>
+      <span class="guess-eyebrow">Looks like a…</span>
+      <span class="guess-label">${match.label}${pct ? ` (${pct}% sure)` : ""}</span>
+    </div>
   `;
 
-  stampMount.appendChild(stamp);
+  guessMount.appendChild(card);
 
   requestAnimationFrame(() => {
-    setTimeout(() => stamp.classList.add("landed"), REDUCE_MOTION ? 0 : 60);
+    setTimeout(() => card.classList.add("landed"), REDUCE_MOTION ? 0 : 40);
   });
 }
 
-function buildLedger(paired, predicted) {
+function buildConfidenceList(paired, predicted) {
   probList.innerHTML = "";
   const sorted = [...paired].sort((a, b) => b.prob - a.prob);
 
@@ -191,7 +197,7 @@ function buildLedger(paired, predicted) {
 
     const name = document.createElement("span");
     name.className = "name";
-    name.textContent = cls.label;
+    name.textContent = `${cls.emoji} ${cls.label}`;
 
     const value = document.createElement("span");
     value.className = "value";
@@ -245,13 +251,13 @@ async function checkApiStatus() {
     if (res.ok) {
       statusEl.classList.add("online");
       statusEl.classList.remove("offline");
-      statusEl.lastChild.textContent = "registry connected";
+      statusEl.lastChild.textContent = "connected";
     } else {
       throw new Error("bad status");
     }
   } catch {
     statusEl.classList.add("offline");
     statusEl.classList.remove("online");
-    statusEl.lastChild.textContent = "registry unreachable";
+    statusEl.lastChild.textContent = "can't connect";
   }
 }

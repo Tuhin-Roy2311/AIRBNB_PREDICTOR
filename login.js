@@ -1,3 +1,5 @@
+renderNav(null, "login");
+
 // If already logged in, skip straight to the dashboard (or wherever ?next= points).
 (async function redirectIfAuthed() {
   const token = getToken();
@@ -17,7 +19,6 @@
 function nextPageOr(fallback) {
   const params = new URLSearchParams(window.location.search);
   const next = params.get("next");
-  // Only allow known local pages — never redirect off-site.
   const allowed = ["dashboard.html", "index.html"];
   return next && allowed.includes(next) ? next : fallback;
 }
@@ -44,14 +45,14 @@ loginForm.addEventListener("submit", async (e) => {
     });
     if (!res.ok) {
       const err = await res.json().catch(() => null);
-      throw new Error(err?.detail || "Verification failed. Check your email and passcode.");
+      throw new Error(err?.detail || "That email and password don't match. Try again?");
     }
     const data = await res.json();
     setToken(data.access_token);
     window.location.href = nextPageOr("dashboard.html");
   } catch (err) {
     authError.textContent = err.message?.includes("fetch")
-      ? "Can't reach the classification registry. Make sure the API is running."
+      ? "Can't reach the server right now — make sure it's running."
       : err.message;
   } finally {
     setLoading(false);
